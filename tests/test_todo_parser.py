@@ -64,7 +64,7 @@ class NewIssueTests(unittest.TestCase):
         self.assertEqual(count_issues_for_file_type(self.raw_issues, 'twig'), 2)
 
     def test_twig_issues(self):
-        self.assertEqual(count_issues_for_file_type(self.raw_issues, 'Dockerfile'), 2)
+        self.assertEqual(count_issues_for_file_type(self.raw_issues, 'dockerfile'), 2)
 
 
 class ClosedIssueTests(unittest.TestCase):
