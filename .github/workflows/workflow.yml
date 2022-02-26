@@ -10,3 +10,6 @@ jobs:
         id: "todo"
         with:
           PROJECTS_SECRET: ${{ secrets.PROJECTS_SECRET }}
+          
+      - name: Test
+        run: python -m unittest
