@@ -102,7 +102,7 @@ index 6397789..494d42f 100644
  name: "TODO to Issue"
 -# TODO: Write a more interesting description
  description: "Converts IDE TODO comments to GitHub issues"
- author: "Michael Buluma"
+ author: "Alastair Mooney"
 -# TODO: Define inputs
 -#  Need to do this before the action is released
 -#  labels: urgent
@@ -211,10 +211,3 @@ index 525e25d..ba4e68d 100644
 -   also need to be turned into todos, and hopefully
 -   kept together as one todo
 - #}
-diff --git a/tests/Dockerfile b/src/tests/dockerfile
-index 525e25d..ba4e68d 100644
---- a/src/tests/dockerfile
-+++ b/src/tests/dockerfile
-@@ -1,6 +0,0 @@
--# TODO: Hopefully this comment turns into a todo issue
--# TODO:Multiline comments
