@@ -1,6 +1,7 @@
-name: "TODO to Issue - Buluma"
-description: "Converts IDE TODO comments to GitHub issues"
-author: "Shadow Walker"
+---
+name: Buluma - TODO Action
+description: Converts IDE TODO comments to GitHub issues
+author: Michael Buluma <me@buluma.me.ke>
 runs:
   using: "docker"
   # image: "docker://ghcr.io/alstr/todo-to-issue-action:v4.6"
