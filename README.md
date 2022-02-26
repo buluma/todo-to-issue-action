@@ -19,7 +19,7 @@ Multiline TODOs are supported, with additional lines inserted into the issue bod
         # TODO Come up with a more imaginative greeting
         #  Everyone uses hello world and it's boring.
         #  labels: enhancement, help wanted
-        #  assignees: alstr, bouteillerAlan, hbjydev
+        #  assignees: buluma, testbot, holydev
         #  milestone: 1
         print('Hello world!')
 ```
@@ -37,7 +37,7 @@ Create a `workflow.yml` file in your `.github/workflows` directory like:
         steps:
           - uses: "actions/checkout@master"
           - name: "TODO to Issue"
-            uses: "alstr/todo-to-issue-action@v4.6.2"
+            uses: "buluma/todo-to-issue-action@v4.6.2"
             id: "todo"
 ```
 
@@ -156,7 +156,7 @@ The syntax is `<user or org name>/project name/column name`. All three must be p
         print('Hello world!')
 ```
 
-You can assign to multiple projects by using commas, for example: `user projects: alstr/Test User Project 1/To Do, alstr/Test User Project 2/Tasks`.
+You can assign to multiple projects by using commas, for example: `user projects: buluma/Test User Project 1/To Do, buluma/Test User Project 2/Tasks`.
 
 You can also specify default projects in the same way by defining `USER_PROJECTS` or `ORG_PROJECTS` in your workflow file. These will be applied automatically to every issue, but will be overrode by any specified within the TODO.
 
