@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: "actions/checkout@master"
       - name: "TODO to Issue"
-        uses: "alstr/todo-to-issue-action@master"
+        uses: "buluma/todo-to-issue-action@v1.0.1"
         id: "todo"
         with:
           PROJECTS_SECRET: ${{ secrets.PROJECTS_SECRET }}
