@@ -24,7 +24,7 @@ class Issue(object):
     """Basic Issue model for collecting the necessary info to send to GitHub."""
 
     def __init__(self, title, labels, assignees, milestone, user_projects, org_projects, body, hunk, file_name,
-                 start_line, markdown_language, status):
+                 start_line, markdown_language, status, identifier):
         self.title = title
         self.labels = labels
         self.assignees = assignees
@@ -37,19 +37,21 @@ class Issue(object):
         self.start_line = start_line
         self.markdown_language = markdown_language
         self.status = status
+        self.identifier = identifier
 
 
 class GitHubClient(object):
     """Basic client for getting the last diff and creating/closing issues."""
     existing_issues = []
-    base_url = 'https://api.github.com/'
-    repos_url = f'{base_url}repos/'
 
     def __init__(self):
+        self.github_url = os.getenv('INPUT_GITHUB_URL')
+        self.base_url = f'{self.github_url}/'
+        self.repos_url = f'{self.base_url}repos/'
         self.repo = os.getenv('INPUT_REPO')
         self.before = os.getenv('INPUT_BEFORE')
         self.sha = os.getenv('INPUT_SHA')
-        self.commits = json.loads(os.getenv('INPUT_COMMITS'))
+        self.commits = json.loads(os.getenv('INPUT_COMMITS')) or []
         self.diff_url = os.getenv('INPUT_DIFF_URL')
         self.token = os.getenv('INPUT_TOKEN')
         self.issues_url = f'{self.repos_url}{self.repo}/issues'
@@ -78,11 +80,11 @@ class GitHubClient(object):
         elif len(self.commits) == 1:
             # There is only one commit
             diff_url = f'{self.repos_url}{self.repo}/commits/{self.sha}'
-        else: 
+        else:
             # There are several commits: compare with the oldest one
             oldest = sorted(self.commits, key=self.get_timestamp)[0]['id']
-            diff_url = f'{self.repos_url}{self.repo}/compare/{oldest}...{self.sha}'    
-        
+            diff_url = f'{self.repos_url}{self.repo}/compare/{oldest}...{self.sha}'
+
         diff_headers = {
             'Accept': 'application/vnd.github.v3.diff',
             'Authorization': f'token {self.token}'
@@ -114,7 +116,7 @@ class GitHubClient(object):
             # Title is too long.
             title = title[:80] + '...'
         formatted_issue_body = self.line_break.join(issue.body)
-        url_to_line = f'https://github.com/{self.repo}/blob/{self.sha}/{issue.file_name}#L{issue.start_line}'
+        url_to_line = f'{self.base_url}{self.repo}/blob/{self.sha}/{issue.file_name}#L{issue.start_line}'
         snippet = '```' + issue.markdown_language + '\n' + issue.hunk + '\n' + '```'
 
         issue_template = os.getenv('INPUT_ISSUE_TEMPLATE', None)
@@ -293,8 +295,21 @@ class TodoParser(object):
     ORG_PROJECTS_PATTERN = re.compile(r'(?<=org projects:\s).+')
 
     def __init__(self):
-        # We could support more identifiers later quite easily.
-        self.identifier = 'TODO'
+        # Load any custom identifiers, otherwise use the default.
+        custom_identifiers = os.getenv('INPUT_IDENTIFIERS')
+        self.identifiers = ['TODO']
+        self.identifiers_dict = None
+        if custom_identifiers:
+            try:
+                custom_identifiers_dict = json.loads(custom_identifiers)
+                for identifier_dict in custom_identifiers_dict:
+                    if type(identifier_dict['name']) != str or type(identifier_dict['labels']) != list:
+                        raise TypeError
+                self.identifiers = [identifier['name'] for identifier in custom_identifiers_dict]
+                self.identifiers_dict = custom_identifiers_dict
+            except (json.JSONDecodeError, KeyError, TypeError):
+                print('Invalid identifiers dict, ignoring.')
+
         self.languages_dict = None
 
         # Load the languages data for ascertaining file types.
@@ -308,7 +323,7 @@ class TodoParser(object):
             raise Exception('Cannot retrieve languages data. Operation will abort.')
 
         # Load the comment syntax data for identifying comments.
-        syntax_url = 'https://raw.githubusercontent.com/buluma/todo-to-issue-action/master/syntax.json'
+        syntax_url = 'https://raw.githubusercontent.com/alstr/todo-to-issue-action/master/syntax.json'
         syntax_request = requests.get(url=syntax_url)
         if syntax_request.status_code == 200:
             self.syntax_dict = syntax_request.json()
@@ -337,7 +352,7 @@ class TodoParser(object):
         prev_block = None
         # Iterate through each section extracted above.
         for hunk in extracted_file_hunks:
-            # Extract the file information so we can figure out the markdown language and comment syntax.
+            # Extract the file information so we can figure out the Markdown language and comment syntax.
             header_search = re.search(self.HEADER_PATTERN, hunk, re.MULTILINE)
             if not header_search:
                 continue
@@ -400,7 +415,7 @@ class TodoParser(object):
                     extracted_comments = []
                     prev_comment = None
                     for i, comment in enumerate(comments):
-                        if i == 0 or self.identifier in comment.group(0):
+                        if i == 0 or re.search('|'.join(self.identifiers), comment.group(0)):
                             extracted_comments.append([comment])
                         else:
                             if comment.start() == prev_comment.end() + 1:
@@ -416,7 +431,7 @@ class TodoParser(object):
                     comments = re.finditer(comment_pattern, block['hunk'], re.DOTALL)
                     extracted_comments = []
                     for i, comment in enumerate(comments):
-                        if self.identifier in comment.group(0):
+                        if re.search('|'.join(self.identifiers), comment.group(0)):
                             extracted_comments.append([comment])
 
                     for comment in extracted_comments:
@@ -446,14 +461,15 @@ class TodoParser(object):
         return issues
 
     def _get_file_details(self, file):
-        """Try and get the markdown language and comment syntax data for the given file."""
+        """Try and get the Markdown language and comment syntax data for the given file."""
         file_name, extension = os.path.splitext(os.path.basename(file))
         for language_name in self.languages_dict:
-            if ('extensions' in self.languages_dict[language_name]
-                    and extension in self.languages_dict[language_name]['extensions']):
-                for syntax_details in self.syntax_dict:
-                    if syntax_details['language'] == language_name:
-                        return syntax_details['markers'], self.languages_dict[language_name]['ace_mode']
+            if 'extensions' in self.languages_dict[language_name]:
+                language_extensions = [ex.lower() for ex in self.languages_dict[language_name]['extensions']]
+                if extension.lower() in language_extensions:
+                    for syntax_details in self.syntax_dict:
+                        if syntax_details['language'] == language_name:
+                            return syntax_details['markers'], self.languages_dict[language_name]['ace_mode']
         return None, None
 
     def _extract_issue_if_exists(self, comment, marker, code_block):
@@ -464,7 +480,7 @@ class TodoParser(object):
             for line in lines:
                 line_status, committed_line = self._get_line_status(line)
                 cleaned_line = self._clean_line(committed_line, marker)
-                line_title, ref = self._get_title(cleaned_line)
+                line_title, ref, identifier = self._get_title(cleaned_line)
                 if line_title:
                     if ref:
                         issue_title = f'[{ref}] {line_title}'
@@ -482,7 +498,8 @@ class TodoParser(object):
                         file_name=code_block['file'],
                         start_line=code_block['start_line'],
                         markdown_language=code_block['markdown_language'],
-                        status=line_status
+                        status=line_status,
+                        identifier=identifier
                     )
 
                     # Calculate the file line number that this issue references.
@@ -514,6 +531,14 @@ class TodoParser(object):
                         issue.org_projects.extend(org_projects)
                     elif len(cleaned_line):
                         issue.body.append(cleaned_line)
+
+        if issue is not None and issue.identifier is not None and self.identifiers_dict is not None:
+            for identifier_dict in self.identifiers_dict:
+                if identifier_dict['name'] == issue.identifier:
+                    for label in identifier_dict['labels']:
+                        if label not in issue.labels:
+                            issue.labels.append(label)
+
         return issue
 
     def _get_line_status(self, comment):
@@ -548,20 +573,25 @@ class TodoParser(object):
         """Check the passed comment for a new issue title (and reference, if specified)."""
         title = None
         ref = None
-        title_pattern = re.compile(r'(?<=' + self.identifier + r'[\s:]).+')
-        title_search = title_pattern.search(comment, re.IGNORECASE)
-        if title_search:
-            title = title_search.group(0).strip()
-        else:
-            title_ref_pattern = re.compile(r'(?<=' + self.identifier + r'\().+')
-            title_ref_search = title_ref_pattern.search(comment, re.IGNORECASE)
-            if title_ref_search:
-                title = title_ref_search.group(0).strip()
-                ref_search = self.REF_PATTERN.search(title)
-                if ref_search:
-                    ref = ref_search.group(0)
-                    title = title.replace(ref, '', 1).lstrip(':) ')
-        return title, ref
+        title_identifier = None
+        for identifier in self.identifiers:
+            title_identifier = identifier
+            title_pattern = re.compile(r'(?<=' + identifier + r'[\s:]).+')
+            title_search = title_pattern.search(comment, re.IGNORECASE)
+            if title_search:
+                title = title_search.group(0).strip()
+                break
+            else:
+                title_ref_pattern = re.compile(r'(?<=' + identifier + r'\().+')
+                title_ref_search = title_ref_pattern.search(comment, re.IGNORECASE)
+                if title_ref_search:
+                    title = title_ref_search.group(0).strip()
+                    ref_search = self.REF_PATTERN.search(title)
+                    if ref_search:
+                        ref = ref_search.group(0)
+                        title = title.replace(ref, '', 1).lstrip(':) ')
+                    break
+        return title, ref, title_identifier
 
     def _get_labels(self, comment):
         """Check the passed comment for issue labels."""
@@ -617,6 +647,18 @@ class TodoParser(object):
 if __name__ == "__main__":
     # Create a basic client for communicating with GitHub, automatically initialised with environment variables.
     client = GitHubClient()
+    # Check to see if the workflow has been run manually.
+    # If so, adjust the client SHA and diff URL to use the manually supplied inputs.
+    manual_commit_ref = os.getenv('MANUAL_COMMIT_REF')
+    manual_base_ref = os.getenv('MANUAL_BASE_REF')
+    if manual_commit_ref:
+        client.sha = manual_commit_ref
+    if manual_commit_ref and manual_base_ref:
+        print(f'Manually comparing {manual_base_ref}...{manual_commit_ref}')
+        client.diff_url = f'{client.repos_url}{client.repo}/compare/{manual_base_ref}...{manual_commit_ref}'
+    elif manual_commit_ref:
+        print(f'Manual checking {manual_commit_ref}')
+        client.diff_url = f'{client.repos_url}{client.repo}/commits/{manual_commit_ref}'
     if client.diff_url or len(client.commits) != 0:
         # Get the diff from the last pushed commit.
         last_diff = StringIO(client.get_last_diff())

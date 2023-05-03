@@ -63,7 +63,7 @@ index 525e25d..ba4e68d 100644
 -def my_method(arg):
 -    """
 -    TODO: Second multiline comment
--    also need to be turned into task, and hopefully 
+-    also need to be turned into task, and hopefully
 -    kept together as one.
 -    """
 -    pass
@@ -71,10 +71,21 @@ index 525e25d..ba4e68d 100644
 -def MyClass:
 -    '''
 -    TODO: Third multiline comment
--    also need to be turned into task, and hopefully 
+-    also need to be turned into task, and hopefully
 -    kept together as one.
 -    '''
 -    pass
+diff --git a/tests/example_file.cr b/tests/example_file.cr
+index e6da2ec..67f14dd 100644
+--- a/tests/example_file.cr
++++ b/tests/example_file.cr
+@@ -1,14 +1,3 @@
+-# TODO: Come up with a more imaginative greeting
+ puts "Greetings"
+-
+-# TODO: Do even more stuff
+-# This function should probably do something more interesting
+-# labels: help wanted
 diff --git a/tests/example_file.rb b/tests/example_file.rb
 index e6da2ec..67f14dd 100644
 --- a/tests/example_file.rb
@@ -145,9 +156,15 @@ index 0000000..7cccc5b
 - # TODO: Hopefully this comment turns into an issue
 - print("Hello World")
 - #= TODO: Multiline comments
--   also need to be turned into task, and hopefully 
+-   also need to be turned into task, and hopefully
 -   kept together as one.
 - =#
+diff --git a/tests/defs.bzl b/tests/defs.bzl
+index 525e25d..ba4e68d 100644
+--- a/tests/defs.bzl
++++ b/tests/defs.bzl
+@@ -0,0 +0,1 @@
+-    # TODO: Come up with a more imaginative greeting
 diff --git a/tests/example_file.ahk b/src/tests/example_file.ahk
 new file mode 100644
 index 0000000..7cccc5b
@@ -157,7 +174,7 @@ index 0000000..7cccc5b
 - ; TODO: Find a better way to manage hotkeys
 - ; Maybe just switch to vim??
 - #h::
-- RegRead, HiddenFiles_Status, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden 
+- RegRead, HiddenFiles_Status, HKEY_CURRENT_USER, Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced, Hidden
 diff --git a/tests/example_file.hbs b/src/tests/example_file.hbs
 new file mode 100644
 index 0000000..7cccc5b
@@ -165,7 +182,7 @@ index 0000000..7cccc5b
 +++ b/src/tests/example_file.hbs
 @@ -0,0 +1,2 @@
 - <!-- TODO: Hopefully this comment turns into a todo issue -->
-- {{! 
+- {{!
 -   TODO: Make a handlebar templtate
 -    This is really just a test, but hopefully this works~!
 - }}
@@ -181,7 +198,7 @@ index 0000000..7cccc5b
 - #+end_src
 - #+begin_comment
 -  TODO: Multiline comments
--   also need to be turned into todos, and hopefully 
+-   also need to be turned into todos, and hopefully
 -   kept together as one todo
 - #+end_comment
 diff --git a/tests/example_file.scss b/tests/example_file.scss
@@ -194,9 +211,9 @@ index 525e25d..ba4e68d 100644
 -  font-weight: bold;
 -  .my-second-class {
 -    /* TODO: Multiline comments
--     * also need to be turned into todos, and hopefully 
+-     * also need to be turned into todos, and hopefully
 -     * kept together as one todo
--     */  
+-     */
 -    text-align: center;
 -  }
 -}
@@ -211,3 +228,134 @@ index 525e25d..ba4e68d 100644
 -   also need to be turned into todos, and hopefully
 -   kept together as one todo
 - #}
+diff --git a/tests/example_file.md b/src/tests/example_file.md
+index 525e25d..ba4e68d 100644
+--- a/src/tests/example_file.md
++++ b/src/tests/example_file.md
+@@ -1,7 +0,0 @@
+- {/* TODO: Hopefully this comment turns into a todo issue */}
+- {/*
+-   TODO:Multiline comments
+-   also need to be turned into todos, and hopefully
+-   kept together as one todo
+- */}
+- - [ ] TODO: An inline todo that's NOT a comment (what)
+diff --git a/tests/example_file.mdx b/src/tests/example_file.mdx
+index 525e25d..ba4e68d 100644
+--- a/src/tests/example_file.mdx
++++ b/src/tests/example_file.mdx
+@@ -1,7 +0,0 @@
+- {/* TODO: Hopefully this comment turns into a todo issue */}
+- {/*
+-   TODO:Multiline comments
+-   also need to be turned into todos, and hopefully
+-   kept together as one todo
+- */}
+- - [ ] TODO: An inline todo that's NOT a comment (what)
+diff --git a/tests/example_file.r b/tests/example_file.r
+index 525e25d..ba4e68d 100644
+--- a/tests/example_file.r
++++ b/tests/example_file.r
+@@ -1,23 +1,2 @@
+hello_world <- function() {
+-    # TODO: Come up with a more imaginative greeting
+     message("Hello world")
+-
+-    # TODO: Do more stuff
+-    #  This function should probably do something more interesting
+-    #  labels: help wanted
+}
+diff --git a/tests/example_file.rmd b/src/tests/example_file.rmd
+index 525e25d..ba4e68d 100644
+--- a/src/tests/example_file.rmd
++++ b/src/tests/example_file.rmd
+@@ -0,1 +0,0 @@
+- <!-- TODO: Check RMarkdown comments work -->
+diff --git a/tests/example_file.qmd b/src/tests/example_file.qmd
+index 525e25d..ba4e68d 100644
+--- a/src/tests/example_file.qmd
++++ b/src/tests/example_file.qmd
+@@ -0,1 +0,0 @@
+- <!-- TODO: Check RMarkdown comments work -->
+diff --git a/src/Swarm/Game/example.hs b/src/Swarm/Game/example.hs
+index 525e25d..ba4e68d 100644
+--- a/src/Swarm/Game/example.hs
++++ b/src/Swarm/Game/example.hs
+@@ -1,14 +0,0 @@
+--- | Standard devices that are always installed.
+---
+--- TODO: Remove standard devices
+---  In the future, make a way to build these and just start the base
+---  out with a large supply of each?
+---  labels: redesign
+-stdDeviceList =
+-  ["treads", "grabber", "solar panel", "scanner", "plasma cutter"]
+-
+-{- | Very complicated function.
+-
+-TODO: Create an issue for TODO
+--}
+-sum a b = a + b
+diff --git a/tests/config.jsonc b/tests/config.jsonc
+index 0000000..525e25d 100644
+--- a/tests/config.jsonc
++++ b/tests/config.jsonc
+@@ -0,0 +0,1 @@
+- // TODO: Delete this line from the codebase
+diff --git a/tests/config.json5 b/tests/config.json5
+index 0000000..525e25d 100644
+--- a/tests/config.json5
++++ b/tests/config.json5
+@@ -0,0 +0,1 @@
+- // TODO: Delete this line from the codebase
+diff --git a/tests/example.clj b/tests/example.clj
+index 0000000..525e25d 100644
+--- a/tests/example.clj
++++ b/tests/example.clj
+@@ -1,8 +0,0 @@
+-(ns example)
+-
+-(defn function-test [name]
+-  ;; TODO: first todo to test parser
+-  (prn (str "hello" name))
+-  ;; TODO: todo with description (sub-level)
+-  ;;  Body of the issue should stay here
+-  (str "hello" name))
+diff --git a/tests/example.gd b/tests/example.gd
+index 0000000..525e25d 100644
+--- a/tests/example.gd
++++ b/tests/example.gd
+@@ -1,5 +0,0 @@
+-# TODO Store all the players here
+-var _players: = []
+-
+-# TODO Play the level music
+-export: var music_path: String
+diff --git a/tests/example.nix b/tests/example.nix
+index a6c6cb0..25d195f 100644
+--- a/tests/example.nix
++++ b/tests/example.nix
+@@ -1,11 +1,7 @@
+ {
+-  # TODO add missing devices
+   stdDeviceList = [
+     "treads"
+     "grabber"
+   ];
+-  /*
+-    TODO add missing c
+-  */
+   sum = a: b: a + b;
+ }
+diff --git a/tests/example.xaml b/tests/example.xaml
+new file mode 100644
+index 0000000..a6c6cb0
+--- /dev/null
++++ b/tests/example.xaml
+@@ -1,4 +1,2 @@
+-<!-- TODO: Add xaml support -->
+-<Label Text="why"/>
+-<!-- TODO: please -->
+-<Label Text="ok"/>
+<Label Text="There you go"/>
+<Label Text="Thank you"/>
