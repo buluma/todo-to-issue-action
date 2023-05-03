@@ -32,15 +32,6 @@
     ]
   },
   {
-    "language": "Dockerfile",
-    "markers": [
-      {
-        "type": "line",
-        "pattern": "#"
-      }
-    ]
-  },
-  {
     "language": "YAML",
     "markers": [
       {
@@ -173,6 +164,31 @@
     ]
   },
   {
+    "language": "JSON with Comments",
+    "markers": [
+      {
+        "type": "line",
+        "pattern": "//"
+      },
+      {
+        "type": "block",
+        "pattern": {
+          "start": "/\\*",
+          "end": "\\*/"
+        }
+      }
+    ]
+  },
+  {
+    "language": "JSON5",
+    "markers": [
+      {
+        "type": "line",
+        "pattern": "//"
+      }
+    ]
+  },
+  {
     "language": "Julia",
     "markers": [
       {
@@ -185,6 +201,15 @@
           "start": "#=",
           "end": "=#"
         }
+      }
+    ]
+  },
+  {
+    "language": "Starlark",
+    "markers": [
+      {
+        "type": "line",
+        "pattern": "#"
       }
     ]
   },
@@ -333,6 +358,22 @@
     ]
   },
   {
+    "language": "Haskell",
+    "markers": [
+      {
+        "type": "line",
+        "pattern": "--"
+      },
+      {
+        "type": "block",
+        "pattern": {
+          "start": "{-",
+          "end": "-}"
+        }
+      }
+    ]
+  },
+  {
     "language": "HTML",
     "markers": [
       {
@@ -367,6 +408,29 @@
   },
   {
     "language": "Markdown",
+    "markers": [
+      {
+        "type": "block",
+        "pattern": {
+          "start": "<!--",
+          "end": "-->"
+        }
+      },
+      {
+        "type": "block",
+        "pattern": {
+          "start": "{/\\*",
+          "end": "\\*/}"
+        }
+      },
+      {
+        "type": "line",
+        "pattern": "- \\[ \\]"
+      }
+    ]
+  },
+  {
+    "language": "RMarkdown",
     "markers": [
       {
         "type": "block",
@@ -427,6 +491,10 @@
       {
         "type": "line",
         "pattern": "%"
+      },
+      {
+        "type": "line",
+        "pattern": "\\\\todo{"
       },
       {
         "type": "block",
@@ -538,6 +606,15 @@
     ]
   },
   {
+    "language": "GDScript",
+    "markers": [
+      {
+        "type": "line",
+        "pattern": "#"
+      }
+    ]
+  },
+  {
     "language": "Go",
     "markers": [
       {
@@ -555,7 +632,7 @@
   },
   {
     "language": "HCL",
-    "markers" : [
+    "markers": [
       {
         "type": "line",
         "pattern": "#"
@@ -575,7 +652,7 @@
   },
   {
     "language": "SCSS",
-    "markers" : [
+    "markers": [
       {
         "type": "line",
         "pattern": "//"
@@ -587,16 +664,71 @@
           "end": "\\*/"
         }
       }
-     ]
+    ]
   },
   {
     "language": "Twig",
-    "markers" : [
+    "markers": [
       {
         "type": "block",
         "pattern": {
           "start": "{#",
           "end": "#}"
+        }
+      }
+    ]
+  },
+  {
+    "language": "Crystal",
+    "markers": [
+      {
+        "type": "line",
+        "pattern": "#"
+      }
+    ]
+  },
+  {
+    "language": "R",
+    "markers": [
+      {
+        "type": "line",
+        "pattern": "#"
+      }
+    ]
+  },
+  {
+    "language": "Clojure",
+    "markers": [
+      {
+        "type": "line",
+        "pattern": ";;"
+      }
+    ]
+  },
+  {
+    "language": "Nix",
+    "markers": [
+      {
+        "type": "line",
+        "pattern": "#"
+      },
+      {
+        "type": "block",
+        "pattern": {
+          "start": "/\\*",
+          "end": "\\*/"
+        }
+      }
+    ]
+  },
+  {
+    "language": "XML",
+    "markers": [
+      {
+        "type": "block",
+        "pattern": {
+          "start": "<!--",
+          "end": "-->"
         }
       }
     ]
