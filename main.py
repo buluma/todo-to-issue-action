@@ -116,7 +116,11 @@ class GitHubClient(object):
             # Title is too long.
             title = title[:80] + '...'
         formatted_issue_body = self.line_break.join(issue.body)
-        url_to_line = f'{self.base_url}{self.repo}/blob/{self.sha}/{issue.file_name}#L{issue.start_line}'
+        if self.base_url == 'https://api.github.com/':
+            line_base_url = 'https://github.com/'
+        else:
+            line_base_url = self.base_url
+        url_to_line = f'{line_base_url}{self.repo}/blob/{self.sha}/{issue.file_name}#L{issue.start_line}'
         snippet = '```' + issue.markdown_language + '\n' + issue.hunk + '\n' + '```'
 
         issue_template = os.getenv('INPUT_ISSUE_TEMPLATE', None)
@@ -295,6 +299,9 @@ class TodoParser(object):
     ORG_PROJECTS_PATTERN = re.compile(r'(?<=org projects:\s).+')
 
     def __init__(self):
+        # Determine if the Issues should be escaped.
+        self.should_escape = os.getenv('INPUT_ESCAPE', 'true') == 'true'
+
         # Load any custom identifiers, otherwise use the default.
         custom_identifiers = os.getenv('INPUT_IDENTIFIERS')
         self.identifiers = ['TODO']
@@ -410,7 +417,32 @@ class TodoParser(object):
             for marker in block['markers']:
                 # Check if there are line or block comments.
                 if marker['type'] == 'line':
-                    comment_pattern = r'(^[+\-\s].*' + marker['pattern'] + r'\s.+$)'
+                    # Add a negative lookup include the second character from alternative comment patterns
+                    # This step is essential to handle cases like in Julia, where '#' and '#=' are comment patterns.
+                    # It ensures that when a space after the comment is optional ('\s' => '\s*'),
+                    # the second character would be matched because of the any character expression ('.+').
+                    suff_escape_list = []
+                    pref_escape_list = []
+                    for to_escape in block['markers']:
+                        if to_escape['type'] == 'line':
+                            if to_escape['pattern'] == marker['pattern']:
+                                continue
+                            if marker['pattern'][0] == to_escape['pattern'][0]:
+                                suff_escape_list.append(self._extract_character(to_escape['pattern'], 1))
+                        else:
+                            # Block comments and line comments cannot have the same comment pattern,
+                            # so a check if the string is the same is unnecessary
+                            if to_escape['pattern']['start'][0] == marker['pattern'][0]:
+                                suff_escape_list.append(self._extract_character(to_escape['pattern']['start'], 1))
+                            search = to_escape['pattern']['end'].find(marker['pattern'])
+                            if search != -1:
+                                pref_escape_list.append(self._extract_character(to_escape['pattern']['end'], search - 1))
+
+                    comment_pattern = (r'(^[+\-\s].*' +
+                                       (r'(?<!(' + '|'.join(pref_escape_list) + r'))' if len(pref_escape_list) > 0 else '') +
+                                       marker['pattern'] +
+                                       (r'(?!(' + '|'.join(suff_escape_list) + r'))' if len(suff_escape_list) > 0 else '') +
+                                       r'\s*.+$)')
                     comments = re.finditer(comment_pattern, block['hunk'], re.MULTILINE)
                     extracted_comments = []
                     prev_comment = None
@@ -530,7 +562,10 @@ class TodoParser(object):
                     elif org_projects:
                         issue.org_projects.extend(org_projects)
                     elif len(cleaned_line):
-                        issue.body.append(cleaned_line)
+                        if self.should_escape:
+                            issue.body.append(self._escape_markdown(cleaned_line))
+                        else:
+                            issue.body.append(cleaned_line)
 
         if issue is not None and issue.identifier is not None and self.identifiers_dict is not None:
             for identifier_dict in self.identifiers_dict:
@@ -540,6 +575,43 @@ class TodoParser(object):
                             issue.labels.append(label)
 
         return issue
+
+    @staticmethod
+    def _escape_markdown(comment):
+        # All basic characters according to: https://www.markdownguide.org/basic-syntax
+        must_escaped = ['\\', '<', '>', '#', '`', '*', '_', '[', ']', '(', ')', '!', '+', '-', '.', '|', '{', '}', '~', '=']
+
+        escaped = ''
+
+        # Linear Escape Algorithm, because the algorithm ends in an infinite loop when using the function 'replace',
+        # which tries to replace all backslashes with duplicate backslashes, i.e. also the already other escaped
+        # characters.
+        for c in comment:
+            if c in must_escaped:
+                escaped += '\\' + c
+            else:
+                escaped += c
+        return escaped
+
+    @staticmethod
+    def _extract_character(input_str, pos):
+        # Extracts a character from the input string at the specified position,
+        # considering escape sequences when applicable.
+        # Test cases
+        # print(_extract_character("/\\*", 1))   # Output: "\*"
+        # print(_extract_character("\\*", 0))    # Output: "\*"
+        # print(_extract_character("\\", 0))     # Output: "\\"
+        # print(_extract_character("w", 0))      # Output: "w"
+        # print(_extract_character("wa", 1))     # Output: "a"
+        # print(_extract_character("\\\\w", 1))  # Output: "\\"
+        if input_str[pos] == '\\':
+            if pos >= 1 and not input_str[pos - 1] == '\\' and len(input_str) > pos + 1:
+                return '\\' + input_str[pos + 1]
+            return '\\\\'
+        if pos >= 1:
+            if input_str[pos - 1] == '\\':
+                return '\\' + input_str[pos]
+        return input_str[pos]
 
     def _get_line_status(self, comment):
         """Return a Tuple indicating whether this is an addition/deletion/unchanged, plus the cleaned comment."""

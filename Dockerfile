@@ -2,8 +2,6 @@ FROM python:3-slim AS builder
 ADD main.py /app/main.py
 WORKDIR /app
 
-# TODO Add Labels
-
 RUN pip install --target=/app requests
 RUN pip install --target=/app -U pip setuptools wheel
 RUN pip install --target=/app ruamel.yaml
