@@ -35,9 +35,9 @@ Create a `workflow.yml` file in your `.github/workflows` directory like:
       build:
         runs-on: "ubuntu-latest"
         steps:
-          - uses: "actions/checkout@master"
+          - uses: "actions/checkout@v4"
           - name: "TODO to Issue"
-            uses: "buluma/todo-to-issue-action@v6.0.0"
+            uses: "buluma/todo-to-issue-action@v2.0.0"
             id: "todo"
 ```
 
