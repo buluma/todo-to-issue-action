@@ -131,7 +131,7 @@ As per the [Google Style Guide](https://google.github.io/styleguide/cppguide.htm
 
 ```python
     def hello_world():
-        # TODO(alstr) Come up with a more imaginative greeting
+        # TODO(buluma) Come up with a more imaginative greeting
         print('Hello world!')
 ```
 
@@ -151,8 +151,8 @@ The syntax is `<user or org name>/project name/column name`. All three must be p
     def hello_world():
         # TODO Come up with a more imaginative greeting
         #  Everyone uses hello world and it's boring.
-        #  user projects: alstr/Test User Project/To Do
-        #  org projects: alstrorg/Test Org Project/To Do
+        #  user projects: buluma/Test User Project/To Do
+        #  org projects: bulumaorg/Test Org Project/To Do
         print('Hello world!')
 ```
 
@@ -199,4 +199,4 @@ Thanks to Jacob Tomlinson for [his handy overview of GitHub Actions](https://www
 
 Thanks to GitHub's [linguist repo](https://github.com/github/linguist/) for the [`languages.yml`](https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml) file used by the app to look up file extensions and determine the correct highlighting to apply to code snippets.
 
-Thanks to all those who have [contributed](https://github.com/alstr/todo-to-issue-action/graphs/contributors) to the further development of this action.
+Thanks to all those who have [contributed](https://github.com/buluma/todo-to-issue-action/graphs/contributors) to the further development of this action.
